@@ -1,9 +1,9 @@
 # Opportunities and Risks of LLM-Based Agentic Workflows in Healthcare Information Systems
 
-> **Note 1:** This document explores both current and potential future applications of MCP (or agent-tooling protocols in general) in healthcare. Some advanced use cases describe theoretical possibilities rather than currently realistic solutions. The examples aim to illustrate the direction of development.i
+> **Note 1:** This document explores both current and potential future applications of MCP (or agent-tooling protocols in general) in healthcare. Some advanced use cases describe theoretical possibilities rather than currently realistic solutions. The examples aim to illustrate the direction of development.
 
 
-> **Note 2:**  This document and its diagrams are a quick draft resulting from collaboration between a human author and AI assistants (Gemini and Claude)
+> **Note 2:**  This document and its diagrams are a quick draft resulting from collaboration between a human author and AI assistants (Gemini and Claude). List of original sources has been omitted from this draft.
 
 
 ## Executive Summary
