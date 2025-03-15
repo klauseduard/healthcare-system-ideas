@@ -1,6 +1,10 @@
 # Opportunities and Risks of LLM-Based Agentic Workflows in Healthcare Information Systems
 
-> **Note to readers:** This document explores both current and potential future applications of MCP (or agent-tooling protocols in general) in healthcare. Some advanced use cases describe theoretical possibilities rather than currently realistic solutions. The examples aim to illustrate the direction of development.
+> **Note 1:** This document explores both current and potential future applications of MCP (or agent-tooling protocols in general) in healthcare. Some advanced use cases describe theoretical possibilities rather than currently realistic solutions. The examples aim to illustrate the direction of development.i
+
+
+> **Note 2:**  This document and its diagrams are a quick draft resulting from collaboration between a human author and AI assistants (Gemini and Claude)
+
 
 ## Executive Summary
 
@@ -303,6 +307,8 @@ The LLM-based agentic workflow in healthcare follows a structured process that e
 
 ## 4. Possible MCP Implementation Examples in Healthcare
 
+> **Note**: The examples below are synthetic and likely not worth deep contemplation at the moment.
+
 To provide a more concrete understanding of what's feasible with MCP in healthcare settings at different time horizons, the following diagrams illustrate implementation examples ranging from currently achievable to more aspirational future goals.
 
 ### 4.1 Currently Feasible Implementations
@@ -408,6 +414,8 @@ This diagram illustrates the progression of MCP implementations from basic assis
 ## 5. Opportunities of LLM-Based Agentic Workflows in Healthcare
 
 > **Tool Orchestration Note**: Each opportunity area below requires the LLM orchestrator to have access to appropriate specialized tools and knowledge sources. The orchestrator might typically work with natural or formal language descriptions of workflows, decision criteria, and contextual rules that guide its tool selection and execution sequence. The value delivered is directly proportional to the quality and completeness of the available tool ecosystem.
+
+> **Note**: The examples below are synthetic and likely not worth deep contemplation at the moment.
 
 ### Enhancing Clinical Decision Support   
 - Real-time monitoring of patient data to identify early signs of conditions like sepsis *(requires vital sign monitoring tools, lab result connectors, and clinical alert protocols)*
