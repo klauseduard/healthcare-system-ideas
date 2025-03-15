@@ -532,6 +532,19 @@ classDiagram
 
 ## 7. Comparison of MCP with Existing Healthcare Technologies
 
+These comparison technologies share an important characteristic with MCP: they each
+introduce elements of dynamism to systems. HATEOAS, while domain-agnostic and part
+of REST architectural principles, might be familiar to healthcare domain implementers
+through FHIR standard, enabling runtime discovery of available actions through hypermedia
+links. SNOMED CT facilitates dynamic clinical reasoning through traversable relationships
+between medical concepts. OpenEHR query languages permit flexible data access patterns
+that adapt to evolving clinical data models. MCP builds upon this tradition of dynamic
+system behavior, unifying and extending these capabilities through LLM-powered orchestration
+that can discover, reason about, and adaptively coordinate tools in response to changing
+contexts. Where these existing technologies each address specific aspects of dynamic
+system behavior, MCP provides a comprehensive framework for intelligent, context-aware
+orchestration across the entire healthcare technology ecosystem
+
 | Feature | HATEOAS | SNOMED CT | openEHR Query Languages (AQL, GDL) | MCP |
 |---------|---------|-----------|-----------------------------------|-----|
 | **Primary Purpose** | API navigation and action discovery | Standardized medical terminology | Structured data querying and decision logic | Dynamic workflow automation and decision-making based on contextual models |
