@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <!-- Background -->
+  <rect width="900" height="600" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="450" y="50" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">CURE Algorithm and Fact Verification Process</text>
+  
+  <!-- CURE Algorithm Description -->
+  <rect x="100" y="100" width="700" height="150" rx="10" fill="#f9f0ff" stroke="#722ed1" stroke-width="2"/>
+  <text x="450" y="125" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle">Clustering Using Representatives (CURE) Algorithm</text>
+  
+  <rect x="130" y="145" width="200" height="80" rx="5" fill="#ffffff" stroke="#722ed1" stroke-width="1"/>
+  <text x="230" y="170" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Hierarchical Clustering</text>
+  <text x="230" y="190" font-family="Arial" font-size="12" text-anchor="middle">Groups data based on similarity</text>
+  <text x="230" y="210" font-family="Arial" font-size="12" text-anchor="middle">and proximity patterns</text>
+  
+  <rect x="350" y="145" width="200" height="80" rx="5" fill="#ffffff" stroke="#722ed1" stroke-width="1"/>
+  <text x="450" y="170" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Distance Measures</text>
+  <text x="450" y="190" font-family="Arial" font-size="12" text-anchor="middle">Determines relationship</text>
+  <text x="450" y="210" font-family="Arial" font-size="12" text-anchor="middle">strength between data points</text>
+  
+  <rect x="570" y="145" width="200" height="80" rx="5" fill="#ffffff" stroke="#722ed1" stroke-width="1"/>
+  <text x="670" y="170" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Outlier Detection</text>
+  <text x="670" y="190" font-family="Arial" font-size="12" text-anchor="middle">Identifies data points that</text>
+  <text x="670" y="210" font-family="Arial" font-size="12" text-anchor="middle">don't match patterns</text>
+  
+  <!-- Fact Verification Process -->
+  <rect x="150" y="280" width="600" height="280" rx="10" fill="#e6f7ff" stroke="#1890ff" stroke-width="2"/>
+  <text x="450" y="305" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle">Fact Verification Process</text>
+  
+  <!-- Step 1 -->
+  <rect x="200" y="330" width="200" height="70" rx="5" fill="#ffffff" stroke="#1890ff" stroke-width="1"/>
+  <text x="300" y="355" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">LLM Output</text>
+  <text x="300" y="375" font-family="Arial" font-size="12" text-anchor="middle">"Patient is a 45-year-old male</text> 
+  <text x="300" y="390" font-family="Arial" font-size="12" text-anchor="middle">with hypertension..."</text>
+  
+  <!-- Step 2 -->
+  <rect x="500" y="330" width="200" height="70" rx="5" fill="#ffffff" stroke="#1890ff" stroke-width="1"/>
+  <text x="600" y="355" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Fact Extraction</text>
+  <text x="600" y="375" font-family="Arial" font-size="12" text-anchor="middle">Fact 1: "Patient is 45 years old"</text>
+  <text x="600" y="390" font-family="Arial" font-size="12" text-anchor="middle">Fact 2: "Patient has hypertension"</text>
+  
+  <!-- Step 3 -->
+  <rect x="200" y="430" width="200" height="70" rx="5" fill="#ffffff" stroke="#1890ff" stroke-width="1"/>
+  <text x="300" y="455" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Source Matching</text>
+  <text x="300" y="475" font-family="Arial" font-size="12" text-anchor="middle">CURE algorithm links each fact</text>
+  <text x="300" y="490" font-family="Arial" font-size="12" text-anchor="middle">to original data sources</text>
+  
+  <!-- Step 4 -->
+  <rect x="500" y="430" width="200" height="70" rx="5" fill="#ffffff" stroke="#1890ff" stroke-width="1"/>
+  <text x="600" y="455" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Verification Scoring</text>
+  <text x="600" y="475" font-family="Arial" font-size="12" text-anchor="middle">Second LLM scores causal</text>
+  <text x="600" y="490" font-family="Arial" font-size="12" text-anchor="middle">relationship between fact and source</text>
+  
+  <!-- Arrows -->
+  <line x1="400" y1="365" x2="500" y2="365" stroke="#1890ff" stroke-width="2"/>
+  <polygon points="498,360 508,365 498,370" fill="#1890ff"/>
+  
+  <line x1="500" y1="465" x2="400" y2="465" stroke="#1890ff" stroke-width="2"/>
+  <polygon points="402,460 392,465 402,470" fill="#1890ff"/>
+  
+  <line x1="600" y1="400" x2="600" y2="430" stroke="#1890ff" stroke-width="2"/>
+  <polygon points="595,428 600,438 605,428" fill="#1890ff"/>
+  
+  <line x1="300" y1="400" x2="300" y2="430" stroke="#1890ff" stroke-width="2"/>
+  <polygon points="295,428 300,438 305,428" fill="#1890ff"/>
+  
+  <!-- Example Results -->
+  <rect x="250" y="530" width="400" height="30" rx="15" fill="#f6ffed" stroke="#52c41a" stroke-width="1"/>
+  <text x="450" y="550" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Each fact is linked to verifiable data sources</text>
+  
+  <!-- Lines connecting to CURE Algorithm -->
+  <line x1="300" y1="250" x2="300" y2="330" stroke="#722ed1" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="450" y1="250" x2="450" y2="280" stroke="#722ed1" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="600" y1="250" x2="600" y2="330" stroke="#722ed1" stroke-width="2" stroke-dasharray="5,5"/>
+</svg>
