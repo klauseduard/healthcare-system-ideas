@@ -27,7 +27,7 @@ flowchart TD
     LLMA[Healthcare LLM Agent:<br>Intelligent Decision<br>Making]
     end
 
-    subgraph "Healthcare Systems Layer"
+    subgraph "Healthcare Systems<br>Layer"
     LS[Legacy Systems:<br> Relational DBs, REST APIs]
     DS[Data Standards:<br> FHIR, SNOMED CT, ICD]
     CA[Clinical Applications:<br> EHR,<br>Clinical Decision Support,<br>Telemedicine]
