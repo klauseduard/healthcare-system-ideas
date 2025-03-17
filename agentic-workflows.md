@@ -24,7 +24,7 @@ flowchart TD
 
     subgraph "MCP Framework"
     MCP[MCP Layer:<br>Context Management<br>& Orchestration]
-    LLMA[Healthcare LLM Agent:<br> Intelligent Decision Making]
+    LLMA[Healthcare LLM Agent:<br>Intelligent Decision<br>Making]
     end
 
     subgraph "Healthcare Systems Layer"
