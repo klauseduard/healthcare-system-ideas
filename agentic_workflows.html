@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare MCP Visualization</title>
+    <style>
+        :root {
+            --primary-color: #60a5fa;
+            --secondary-color: #6c9bd1;
+            --accent-color: #2563eb;
+            --light-bg: #f0f9ff;
+            --risk-high: #f87171;
+            --risk-medium: #fbbf24;
+            --risk-low: #4ade80;
+            --text-dark: #1e293b;
+            --text-light: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+        
+        header {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+        
+        nav {
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+        }
+        
+        nav button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        nav button:hover, nav button.active {
+            background-color: var(--accent-color);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .architecture-diagram {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .layer {
+            width: 80%;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+        }
+        
+        .layer h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .user-layer {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .mcp-layer {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .healthcare-layer {
+            background-color: #818cf8;
+            color: white;
+        }
+        
+        .connector {
+            height: 30px;
+            width: 2px;
+            background-color: #64748b;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .connector::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #64748b;
+        }
+        
+        .components {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .component {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 0.8rem;
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .tools-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .agent-circle {
+            width: 150px;
+            height: 150px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .registry {
+            width: 300px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .tools-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
+        .tool {
+            width: 130px;
+            height: 80px;
+            background-color: #a78bfa;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .tool:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool.new {
+            background-color: #c084fc;
+            border: 2px dashed white;
+        }
+        
+        .tool-info {
+            position: absolute;
+            background-color: var(--text-dark);
+            color: var(--text-light);
+            padding: 1rem;
+            border-radius: 8px;
+            max-width: 300px;
+            display: none;
+            z-index: 10;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .comparison-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: var(--light-bg);
+        }
+        
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        
+        .risk-table th, .risk-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .risk-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .risk-critical {
+            background-color: #fecaca;
+            color: #991b1b;
+        }
+        
+        .risk-high {
+            background-color: #fed7aa;
+            color: #9a3412;
+        }
+        
+        .risk-medium {
+            background-color: #fef08a;
+            color: #854d0e;
+        }
+        
+        .risk-low {
+            background-color: #bbf7d0;
+            color: #166534;
+        }
+        
+        .phases {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .phase {
+            flex: 1;
+            margin: 0 1rem;
+            padding: 1.5rem;
+            background-color: #93c5fd;
+            color: white;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .phase h3 {
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        
+        .phase ul {
+            padding-left: 1.5rem;
+        }
+        
+        .phase-arrow {
+            display: flex;
+            align-items: center;
+            color: #93c5fd;
+            font-size: 2rem;
+        }
+        
+        .risk-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .examples {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            color: var(--text-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .examples h4 {
+            margin-top: 0;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        footer {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .tool-adaptation-demo {
+            display: flex;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .tool-status-panel, .workflow-panel {
+            flex: 1;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-items {
+            margin: 1rem 0;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .tool-name {
+            font-weight: 500;
+        }
+        
+        .status-indicator {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .status-indicator.online {
+            background-color: var(--risk-low);
+            color: #064e3b;
+        }
+        
+        .status-indicator.offline {
+            background-color: var(--risk-high);
+            color: #7f1d1d;
+        }
+        
+        .demo-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .demo-button:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .workflow-display {
+            min-height: 150px;
+            background-color: white;
+            border-radius: 6px;
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .comparison-blocks {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .comparison-block {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .comparison-block h5 {
+            margin: 0;
+            padding: 0.8rem;
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+        }
+        
+        #without-mcp, #with-mcp {
+            padding: 1rem;
+            background-color: #f8fafc;
+            min-height: 150px;
+        }
+        
+        #without-mcp {
+            border-left: 4px solid var(--risk-high);
+        }
+        
+        #with-mcp {
+            border-left: 4px solid var(--risk-low);
+        }
+        
+        .workflow-step {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .workflow-step::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+        
+        .workflow-fallback {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background-color: #fef3c7;
+            border-radius: 4px;
+            border-left: 4px solid var(--risk-medium);
+        }
+        
+        .decision-support-demo {
+            margin-top: 3rem;
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .scenario-container {
+            margin-top: 1.5rem;
+        }
+        
+        .patient-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .patient-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+        
+        .patient-avatar {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: white;
+        }
+        
+        .patient-info h4 {
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .patient-info p {
+            margin: 0;
+            color: #64748b;
+        }
+        
+        .medication-section h5 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+        
+        .med-options {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .med-option {
+            background-color: #f1f5f9;
+            border-radius: 4px;
+            padding: 0.8rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .med-name {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        
+        .med-info {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .workflow-comparison {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .workflow-column {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .workflow-column h4 {
+            margin-top: 0;
+            text-align: center;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .workflow-steps {
+            padding: 1rem 0;
+        }
+        
+        .workflow-step {
+            position: relative;
+            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            margin-bottom: 0.8rem;
+            border-left: 2px solid #e2e8f0;
+        }
+        
+        .workflow-step::before {
+            content: '→';
+            position: absolute;
+            left: 0.3rem;
+            color: var(--accent-color);
+        }
+        
+        .workflow-step.highlight-step {
+            background-color: #eff6ff;
+            border-left: 2px solid var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .decision-card {
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .decision-card h5 {
+            margin-top: 0;
+            color: var(--text-dark);
+        }
+        
+        .decision-card.improved {
+            background-color: #ecfdf5;
+            border-left: 4px solid var(--risk-low);
+        }
+        
+        .genetic-insight {
+            color: #059669;
+            font-weight: 500;
+        }
+        
+        .note {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+        
+        .benefit-summary {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .benefit-summary h4 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+        
+        .benefit-summary ul {
+            margin-bottom: 0;
+        }
+        
+        .benefit-summary li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .integration-steps {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .step-timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .timeline-step {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .timeline-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-number {
+            position: absolute;
+            left: -2rem;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        .step-content {
+            padding-left: 0.5rem;
+        }
+        
+        .step-content h5 {
+            margin: 0 0 0.5rem 0;
+            color: var(--accent-color);
+        }
+        
+        .step-content p {
+            margin: 0;
+        }
+        
+        .phases .phase:nth-child(1) {
+            background-color: #bbf7d0;
+            color: #166534;
+        }
+        
+        .phases .phase:nth-child(2) {
+            background-color: #fecaca;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MCP in Healthcare Systems</h1>
+        <p>Opportunities and Risks of LLM-Based Agentic Workflows</p>
+    </header>
+    
+    <nav>
+        <button class="tab-button active" data-tab="architecture">Architecture</button>
+        <button class="tab-button" data-tab="tool-discovery">Tool Discovery</button>
+        <button class="tab-button" data-tab="tool-adaptation">Tool Adaptation</button>
+        <button class="tab-button" data-tab="comparison">Technology Comparison</button>
+        <button class="tab-button" data-tab="risks">Risk Analysis</button>
+        <button class="tab-button" data-tab="implementation">Implementation Phases</button>
+    </nav>
+    
+    <main>
+        <section id="architecture" class="tab-content active">
+            <h2>MCP Architecture in Healthcare</h2>
+            <div class="architecture-diagram">
+                <div class="layer user-layer">
+                    <h3>User Layer</h3>
+                    <div class="components">
+                        <div class="component">Healthcare Professionals</div>
+                    </div>
+                </div>
+                <div class="connector"></div>
+                <div class="layer mcp-layer">
+                    <h3>MCP Framework</h3>
+                    <div class="components">
+                        <div class="component">MCP Layer: Context Management & Orchestration</div>
+                        <div class="component">Healthcare LLM Agent: Intelligent Decision Making</div>
+                    </div>
+                </div>
+                <div class="connector"></div>
+                <div class="layer healthcare-layer">
+                    <h3>Healthcare Systems Layer</h3>
+                    <div class="components">
+                        <div class="component">Legacy Systems: Relational DBs, REST APIs</div>
+                        <div class="component">Data Standards: FHIR, SNOMED CT, ICD</div>
+                        <div class="component">Clinical Applications: EHR, Clinical Decision Support, Telemedicine</div>
+                    </div>
+                </div>
+            </div>
+            <p>The Model Context Protocol (MCP) represents a significant advancement in how AI systems interact with healthcare environments. It establishes secure and standardized connections between AI assistants and diverse healthcare systems where patient data resides, including electronic health records, clinical decision support tools, and specialized applications.</p>
+        </section>
+        
+        <section id="tool-discovery" class="tab-content">
+            <h2>Dynamic Tool Discovery in MCP</h2>
+            <div class="tools-diagram">
+                <div class="agent-circle">
+                    LLM Agent
+                    <div id="agent-info" class="tool-info">The LLM agent can dynamically discover and integrate with new tools as they become available, without requiring reconfiguration or redeployment.</div>
+                </div>
+                <div class="connector"></div>
+                <div class="registry">
+                    MCP Tool Registry
+                </div>
+                <div class="connector"></div>
+                <div class="tools-container">
+                    <div class="tool" data-info="Electronic Health Record system that stores patient medical history">EHR System</div>
+                    <div class="tool" data-info="Laboratory information system that manages test orders and results">Lab System</div>
+                    <div class="tool" data-info="Medication management system with drug information and interactions">Pharmacy System</div>
+                    <div class="tool" data-info="Standards-based API for healthcare data exchange">FHIR API</div>
+                    <div class="tool new" data-info="Recently added service that analyzes genetic data to predict medication responses">New Pharmacogenomic Service</div>
+                </div>
+            </div>
+            <div class="decision-support-demo">
+                <h3>Clinical Decision Support with Pharmacogenomics</h3>
+                <div class="scenario-container">
+                    <div class="patient-card">
+                        <div class="patient-header">
+                            <div class="patient-avatar">👤</div>
+                            <div class="patient-info">
+                                <h4>Patient: John D.</h4>
+                                <p>55 years old, hypertension, type 2 diabetes</p>
+                            </div>
+                        </div>
+                        <div class="medication-section">
+                            <h5>Medication Decision</h5>
+                            <div class="med-options">
+                                <div class="med-option">
+                                    <span class="med-name">Clopidogrel</span>
+                                    <span class="med-info">Antiplatelet therapy</span>
+                                </div>
+                                <div class="med-option">
+                                    <span class="med-name">Warfarin</span>
+                                    <span class="med-info">Anticoagulant therapy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workflow-comparison">
+                        <div class="workflow-column">
+                            <h4>Before New Service</h4>
+                            <div class="workflow-steps old-workflow">
+                                <div class="workflow-step">Check EHR for patient history</div>
+                                <div class="workflow-step">Review lab results from Lab System</div>
+                                <div class="workflow-step">Check medication interactions in Pharmacy System</div>
+                                <div class="workflow-step">Make medication recommendation based on standard guidelines</div>
+                            </div>
+                            <div class="decision-card">
+                                <h5>Decision:</h5>
+                                <p><strong>Standard dose of Clopidogrel recommended</strong></p>
+                                <p class="note">Based on general population response data</p>
+                            </div>
+                        </div>
+                        
+                        <div class="workflow-column">
+                            <h4>With Pharmacogenomic Service</h4>
+                            <div class="workflow-steps new-workflow">
+                                <div class="workflow-step">Check EHR for patient history</div>
+                                <div class="workflow-step">Review lab results from Lab System</div>
+                                <div class="workflow-step">Check medication interactions in Pharmacy System</div>
+                                <div class="workflow-step highlight-step">Query Pharmacogenomic Service for CYP2C19 status</div>
+                                <div class="workflow-step highlight-step">Analyze genetic factors for medication response</div>
+                                <div class="workflow-step">Make personalized medication recommendation</div>
+                            </div>
+                            <div class="decision-card improved">
+                                <h5>Decision:</h5>
+                                <p><strong>Alternative to Clopidogrel recommended</strong></p>
+                                <p class="genetic-insight">Patient has CYP2C19 poor metabolizer status</p>
+                                <p class="note">Potential for reduced effectiveness of standard clopidogrel</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-summary">
+                        <h4>Key Benefits of Dynamic Tool Integration</h4>
+                        <ul>
+                            <li>Immediate access to new genetic insights without system reconfiguration</li>
+                            <li>Personalized medication decisions based on patient's genetic profile</li>
+                            <li>Reduced adverse drug events through precision prescribing</li>
+                            <li>Seamless integration into existing clinical decision workflows</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="demo-toggle" class="demo-button">Show Dynamic Integration Process</button>
+                <div id="integration-steps" class="integration-steps" style="display: none;">
+                    <div class="step-timeline">
+                        <div class="timeline-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h5>New Service Added</h5>
+                                <p>Pharmacogenomic service is deployed in hospital infrastructure</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h5>MCP Registry Update</h5>
+                                <p>Service registers its capabilities with the MCP Registry</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h5>Agent Discovery</h5>
+                                <p>LLM agent discovers the new tool and its capabilities</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h5>Context Evaluation</h5>
+                                <p>Agent determines pharmacogenomic data is relevant for medication decisions</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h5>Workflow Integration</h5>
+                                <p>Genetic insights are automatically incorporated into decision support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h3>How Dynamic Tool Discovery Works</h3>
+            <ol>
+                <li><strong>Registry Discovery:</strong> The LLM agent connects to the MCP Tool Registry to discover available tools</li>
+                <li><strong>Tool Registration:</strong> New tools register their capabilities with the MCP Registry</li>
+                <li><strong>Dynamic Adaptation:</strong> The agent automatically discovers newly registered tools</li>
+                <li><strong>Seamless Integration:</strong> Healthcare professionals benefit from new capabilities without system changes</li>
+            </ol>
+            <div class="examples">
+                <h4>Example Scenario</h4>
+                <p>When a hospital adds a new pharmacogenomic analysis service to its IT ecosystem:</p>
+                <p><strong>Without MCP:</strong> The clinical decision support system would require manual updates, reconfiguration, and possibly redeployment to utilize the new service.</p>
+                <p><strong>With MCP:</strong> The new service is registered with the MCP registry, and the LLM agent automatically discovers and incorporates it into workflows where genetic insights could improve medication decisions.</p>
+            </div>
+        </section>
+        
+        <section id="tool-adaptation" class="tab-content">
+            <h2>Adaptation to Tool Unavailability</h2>
+            <p>One of the key advantages of MCP in healthcare is its ability to gracefully handle situations when a tool or system becomes unavailable. This resilience is crucial in clinical environments where system outages could otherwise disrupt patient care.</p>
+            
+            <div class="examples">
+                <h4>Tool Unavailability Scenario</h4>
+                <p>A clinical laboratory system temporarily goes offline during maintenance</p>
+                
+                <div class="tool-adaptation-demo">
+                    <div class="tool-status-panel">
+                        <h5>Tool Status</h5>
+                        <div class="status-items">
+                            <div class="status-item">
+                                <span class="tool-name">EHR System</span>
+                                <span class="status-indicator online">Online</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="tool-name">Lab System</span>
+                                <span class="status-indicator online" id="lab-status">Online</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="tool-name">Pharmacy System</span>
+                                <span class="status-indicator online">Online</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="tool-name">FHIR API</span>
+                                <span class="status-indicator online">Online</span>
+                            </div>
+                        </div>
+                        <button id="toggle-lab" class="demo-button">Toggle Lab System Availability</button>
+                    </div>
+                    
+                    <div class="workflow-panel">
+                        <h5>Clinical Workflow</h5>
+                        <div class="workflow-display" id="workflow-display">
+                            <p>Normal workflow: Patient lab results are retrieved directly from the primary Laboratory System.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-blocks">
+                    <div class="comparison-block">
+                        <h5>Without MCP</h5>
+                        <div id="without-mcp">
+                            <p>Workflow interruption</p>
+                            <p>Manual workarounds needed</p>
+                            <p>Possible delays in care</p>
+                            <p>Error messages for users</p>
+                        </div>
+                    </div>
+                    <div class="comparison-block">
+                        <h5>With MCP</h5>
+                        <div id="with-mcp">
+                            <p>Graceful degradation</p>
+                            <p>Automatic fallback to alternatives</p>
+                            <p>Notification of limited data</p>
+                            <p>Continuous operation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-summary" style="margin-top: 2rem;">
+                <h4>Key Benefits of Tool Unavailability Adaptation</h4>
+                <ul>
+                    <li>Minimized workflow disruptions during system outages</li>
+                    <li>Reduced need for manual interventions and workarounds</li>
+                    <li>Improved clinical continuity during IT maintenance periods</li>
+                    <li>Enhanced resilience against cascade failures</li>
+                    <li>Automatic recovery when systems become available again</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="comparison" class="tab-content">
+            <h2>Comparison with Traditional Healthcare Technologies</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Primary Purpose</th>
+                        <th>Context Awareness</th>
+                        <th>Dynamic Adaptation</th>
+                        <th>Agentic Capabilities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HATEOAS</td>
+                        <td>API navigation and action discovery</td>
+                        <td>Limited to API state transitions</td>
+                        <td>Enables discoverability of actions dynamically</td>
+                        <td>No inherent agentic capabilities</td>
+                    </tr>
+                    <tr>
+                        <td>SNOMED CT</td>
+                        <td>Standardized medical terminology</td>
+                        <td>Supports context-aware reasoning via codified knowledge</td>
+                        <td>Terminology standard; context in codes and relations</td>
+                        <td>No inherent agentic capabilities</td>
+                    </tr>
+                    <tr>
+                        <td>openEHR Query Languages</td>
+                        <td>Structured data querying and decision logic</td>
+                        <td>Allows structured, computable queries</td>
+                        <td>Requires pre-defined queries and logic</td>
+                        <td>Limited to pre-defined logic</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td><strong>MCP</strong></td>
+                        <td>Dynamic workflow automation and context-aware decision-making</td>
+                        <td>Enables higher-level contextual reasoning in a system</td>
+                        <td>Facilitates workflow automation based on evolving context</td>
+                        <td>Proactive, context-aware agents that anticipate needs</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>These technologies share an important characteristic with MCP: they each introduce elements of dynamism to systems. MCP builds upon this tradition of dynamic system behavior, unifying and extending these capabilities through LLM-powered orchestration that can discover, reason about, and adaptively coordinate tools in response to changing contexts.</p>
+        </section>
+        
+        <section id="risks" class="tab-content">
+            <h2>Risk Analysis for Healthcare MCP Implementation</h2>
+            <table class="risk-table">
+                <thead>
+                    <tr>
+                        <th>Risk Category</th>
+                        <th>Specific Risks</th>
+                        <th>Mitigation Strategies</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="risk-critical">Data Privacy & Security<br>(Critical Risk)</td>
+                        <td>
+                            <ul>
+                                <li>PHI Exposure</li>
+                                <li>Unauthorized Access</li>
+                                <li>Data Exfiltration</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>End-to-end encryption</li>
+                                <li>Data minimization principles</li>
+                                <li>Comprehensive audit trails</li>
+                                <li>Role-based access controls</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="risk-high">Accuracy & Bias<br>(High Risk)</td>
+                        <td>
+                            <ul>
+                                <li>Hallucinated Information</li>
+                                <li>Demographic Bias</li>
+                                <li>Inconsistent Outputs</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Rigorous model validation</li>
+                                <li>Diverse training data</li>
+                                <li>Human oversight for critical decisions</li>
+                                <li>Hallucination detection methods</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="risk-medium">Transparency & Trust<br>(Medium Risk)</td>
+                        <td>
+                            <ul>
+                                <li>Black Box Decision-Making</li>
+                                <li>Lack of Explainability</li>
+                                <li>Reduced Clinician Trust</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Explainable AI techniques</li>
+                                <li>User-friendly interfaces</li>
+                                <li>Comprehensive documentation</li>
+                                <li>Training programs for healthcare staff</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="risk-low">Technical Integration<br>(Low Risk)</td>
+                        <td>
+                            <ul>
+                                <li>Data Format Incompatibility</li>
+                                <li>Authentication Challenges</li>
+                                <li>Performance Bottlenecks</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Standardized APIs (FHIR)</li>
+                                <li>Secure authentication protocols</li>
+                                <li>API gateways</li>
+                                <li>Performance optimization techniques</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Risk-Benefit Balance in Dynamic Tool Orchestration</h3>
+            <div class="phases">
+                <div class="phase" style="background-color: #bbf7d0;">
+                    <h3>Benefits</h3>
+                    <ul>
+                        <li>Future-proofing of systems</li>
+                        <li>Reduced integration maintenance</li>
+                        <li>Context-aware tool selection</li>
+                        <li>Adaptive workflow optimization</li>
+                        <li>Graceful degradation when tools fail</li>
+                    </ul>
+                </div>
+                <div class="phase" style="background-color: #fecaca;">
+                    <h3>Risks</h3>
+                    <ul>
+                        <li>Selection of less optimal tools</li>
+                        <li>Missing critical tools for analysis</li>
+                        <li>Inefficient execution sequences</li>
+                        <li>Cascade failures across tools</li>
+                        <li>Unclear responsibility for errors</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="implementation" class="tab-content">
+            <h2>Implementation Phases in Healthcare</h2>
+            <div class="phases">
+                <div class="phase">
+                    <div class="risk-badge" style="background-color: var(--risk-low);">Low</div>
+                    <h3>Phase 1: Initial Integration</h3>
+                    <ul>
+                        <li>Read-only access to systems</li>
+                        <li>Basic documentation assistance</li>
+                        <li>Information retrieval</li>
+                        <li>Simple workflow guidance</li>
+                        <li>Limited to non-critical systems</li>
+                    </ul>
+                    <div class="examples">
+                        <h4>Example Use Cases</h4>
+                        <ul>
+                            <li>Medical documentation assistant</li>
+                            <li>Patient education content generation</li>
+                            <li>Administrative workflow guidance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="phase-arrow">➡️</div>
+                <div class="phase">
+                    <div class="risk-badge" style="background-color: var(--risk-medium);">Medium</div>
+                    <h3>Phase 2: Enhanced Capabilities</h3>
+                    <ul>
+                        <li>Limited write access</li>
+                        <li>Context-aware suggestions</li>
+                        <li>Multi-system integration</li>
+                        <li>Moderate workflow automation</li>
+                        <li>Expanded tool discovery</li>
+                    </ul>
+                    <div class="examples">
+                        <h4>Example Use Cases</h4>
+                        <ul>
+                            <li>Appointment scheduling optimization</li>
+                            <li>Basic clinical data summarization</li>
+                            <li>Automated documentation review</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="phase-arrow">➡️</div>
+                <div class="phase">
+                    <div class="risk-badge" style="background-color: var(--risk-high);">High</div>
+                    <h3>Phase 3: Advanced Integration</h3>
+                    <ul>
+                        <li>Comprehensive system access</li>
+                        <li>Clinical decision support</li>
+                        <li>Proactive workflow orchestration</li>
+                        <li>Predictive analytics integration</li>
+                        <li>Full dynamic tool adaptation</li>
+                    </ul>
+                    <div class="examples">
+                        <h4>Example Use Cases</h4>
+                        <ul>
+                            <li>Clinical decision support</li>
+                            <li>Patient risk stratification</li>
+                            <li>Treatment pathway orchestration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin: 2rem 0;">
+                <h3>Implementation Approach</h3>
+                <p>Phased, with progressive validation and increasing capabilities</p>
+                <p>Start with non-critical, read-only systems and progress to more complex integrations only after validation</p>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>MCP Healthcare System Visualization © 2023</p>
+    </footer>
+    
+    <script>
+        // Tab navigation
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Tool hover effects
+        const tools = document.querySelectorAll('.tool');
+        const agentCircle = document.querySelector('.agent-circle');
+        const agentInfo = document.getElementById('agent-info');
+        
+        agentCircle.addEventListener('mouseover', () => {
+            agentInfo.style.display = 'block';
+            agentInfo.style.top = '0';
+            agentInfo.style.left = '170px';
+        });
+        
+        agentCircle.addEventListener('mouseout', () => {
+            agentInfo.style.display = 'none';
+        });
+        
+        tools.forEach(tool => {
+            const info = tool.getAttribute('data-info');
+            const toolInfo = document.createElement('div');
+            toolInfo.className = 'tool-info';
+            toolInfo.textContent = info;
+            tool.appendChild(toolInfo);
+            
+            tool.addEventListener('mouseover', () => {
+                toolInfo.style.display = 'block';
+                toolInfo.style.top = '-80px';
+                toolInfo.style.left = '0';
+                
+                // If it's the new tool, make a visual connection to agent
+                if (tool.classList.contains('new')) {
+                    tool.style.transform = 'scale(1.1) translateY(-5px)';
+                    tool.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.2)';
+                    agentCircle.style.backgroundColor = '#c084fc';
+                }
+            });
+            
+            tool.addEventListener('mouseout', () => {
+                toolInfo.style.display = 'none';
+                
+                // Reset the visual connection
+                if (tool.classList.contains('new')) {
+                    tool.style.transform = '';
+                    tool.style.boxShadow = '';
+                    agentCircle.style.backgroundColor = '';
+                }
+            });
+        });
+        
+        // Add animation to the architecture diagram
+        const layers = document.querySelectorAll('.layer');
+        let delay = 0;
+        
+        // Initial state - hide all layers
+        layers.forEach(layer => {
+            layer.style.opacity = '0';
+            layer.style.transform = 'translateY(20px)';
+            layer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        });
+        
+        // Animate in sequence
+        setTimeout(() => {
+            layers.forEach(layer => {
+                setTimeout(() => {
+                    layer.style.opacity = '1';
+                    layer.style.transform = 'translateY(0)';
+                }, delay);
+                delay += 300;
+            });
+        }, 500);
+        
+        // Tool Unavailability Demo
+        const toggleLabBtn = document.querySelector('#tool-adaptation #toggle-lab');
+        const labStatus = document.querySelector('#tool-adaptation #lab-status');
+        const workflowDisplay = document.querySelector('#tool-adaptation #workflow-display');
+        const withoutMcp = document.querySelector('#tool-adaptation #without-mcp');
+        const withMcp = document.querySelector('#tool-adaptation #with-mcp');
+        
+        let labOnline = true;
+        
+        toggleLabBtn.addEventListener('click', () => {
+            labOnline = !labOnline;
+            
+            if (!labOnline) {
+                // Lab system is offline
+                labStatus.textContent = 'Offline';
+                labStatus.classList.remove('online');
+                labStatus.classList.add('offline');
+                
+                // Update workflow display
+                workflowDisplay.innerHTML = `
+                    <div class="workflow-step">Agent attempts to access laboratory data through the primary laboratory system</div>
+                    <div class="workflow-step">System unavailable detection</div>
+                    <div class="workflow-fallback">
+                        <strong>Fallback Strategy:</strong>
+                        <ul>
+                            <li>Identify alternative data sources (backup systems, cached data)</li>
+                            <li>Modify approach to use available tools</li>
+                            <li>Show notification about limited data availability</li>
+                            <li>Continue supporting the clinical workflow with best available information</li>
+                        </ul>
+                    </div>
+                `;
+                
+                // Highlight the "Without MCP" and "With MCP" differences
+                withoutMcp.innerHTML = `
+                    <p><strong>❌ Workflow interruption</strong></p>
+                    <p><strong>❌ Manual workarounds needed</strong></p>
+                    <p><strong>❌ Possible delays in care</strong></p>
+                    <p><strong>❌ Error messages for users</strong></p>
+                `;
+                
+                withMcp.innerHTML = `
+                    <p><strong>✅ Graceful degradation</strong></p>
+                    <p><strong>✅ Automatic fallback to alternatives</strong></p>
+                    <p><strong>✅ Notification of limited data</strong></p>
+                    <p><strong>✅ Continuous operation</strong></p>
+                `;
+            } else {
+                // Lab system is back online
+                labStatus.textContent = 'Online';
+                labStatus.classList.remove('offline');
+                labStatus.classList.add('online');
+                
+                // Update workflow display
+                workflowDisplay.innerHTML = `
+                    <p>Normal workflow: Patient lab results are retrieved directly from the primary Laboratory System.</p>
+                    <div class="workflow-step">Agent automatically resumes using primary Lab System</div>
+                    <div class="workflow-step">Full lab data access restored without requiring intervention</div>
+                `;
+                
+                // Reset the "Without MCP" and "With MCP" displays
+                withoutMcp.innerHTML = `
+                    <p>Workflow interruption</p>
+                    <p>Manual workarounds needed</p>
+                    <p>Possible delays in care</p>
+                    <p>Error messages for users</p>
+                `;
+                
+                withMcp.innerHTML = `
+                    <p>Graceful degradation</p>
+                    <p>Automatic fallback to alternatives</p>
+                    <p>Notification of limited data</p>
+                    <p>Continuous operation</p>
+                `;
+            }
+        });
+        
+        // Integration process toggle
+        const demoToggleBtn = document.getElementById('demo-toggle');
+        const integrationSteps = document.getElementById('integration-steps');
+        
+        demoToggleBtn.addEventListener('click', () => {
+            if (integrationSteps.style.display === 'none') {
+                integrationSteps.style.display = 'block';
+                demoToggleBtn.textContent = 'Hide Integration Process';
+                
+                // Animate the steps appearing
+                const steps = document.querySelectorAll('.timeline-step');
+                steps.forEach((step, index) => {
+                    step.style.opacity = '0';
+                    step.style.transform = 'translateY(20px)';
+                    step.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                    
+                    setTimeout(() => {
+                        step.style.opacity = '1';
+                        step.style.transform = 'translateY(0)';
+                    }, 300 + (index * 200));
+                });
+            } else {
+                integrationSteps.style.display = 'none';
+                demoToggleBtn.textContent = 'Show Dynamic Integration Process';
+            }
+        });
+        
+        // Let's also enhance the new pharmacogenomic tool in the tools diagram
+        const pharmaTool = document.querySelector('.tool.new');
+        if (pharmaTool) {
+            pharmaTool.addEventListener('click', () => {
+                // Scroll to the decision support demo when the new tool is clicked
+                const decisionDemo = document.querySelector('.decision-support-demo');
+                if (decisionDemo) {
+                    decisionDemo.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Highlight the demo briefly
+                    decisionDemo.style.boxShadow = '0 0 0 3px var(--accent-color)';
+                    setTimeout(() => {
+                        decisionDemo.style.boxShadow = '';
+                    }, 2000);
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
